@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+      crossorigin="anonymous"
+    />
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+      crossorigin="anonymous"
+    ></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <form id="form" >
+        <fieldset>
+          <legend><strong>Enter Your Question</strong></legend>
+          <div class="mb-3">
+            <label for="topic" class="form-label">Create By</label>
+            <input
+              type="email"
+              id="createdBy"
+              class="form-control"
+              placeholder="sachin@gmail.com"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="topic" class="form-label">Topic</label>
+            <input
+              type="text"
+              id="topic"
+              class="form-control"
+              placeholder="Science"
+            />
+          </div>
+          <div id="append0" class="card p-3 mb-3">
+            <div class="mb-3">
+              <label for="question" class="form-label">Question</label>
+              <input
+                type="text"
+                id="question"
+                class="form-control"
+                placeholder="Write Your Question"
+              />
+            </div>
+            <div class="row mb-3 p-2">
+              <div class="col form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="option1"
+                />
+                <input
+                  type="text"
+                  id="option1"
+                  class="form-control"
+                  placeholder="option1"
+                />
+              </div>
+              <div class="col form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="option2"
+                />
+                <input
+                  type="text"
+                  id="option2"
+                  class="form-control"
+                  placeholder="option2"
+                />
+              </div>
+              <div class="col form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="option3"
+                />
+                <input
+                  type="text"
+                  id="option3"
+                  class="form-control"
+                  placeholder="option3"
+                />
+              </div>
+              <div class="col form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  value="option4"
+                />
+                <input
+                  type="text"
+                  id="option4"
+                  class="form-control"
+                  placeholder="option4"
+                />
+              </div>
+            </div>
+          </div>
+         <div id="append"></div>
+        </fieldset>
+      </form>
+      <button class="btn btn-secondary" onclick="append()">+</button>
+      <button id="finalsubmit" class="btn btn-primary m-2" onclick="sendData()">
+        Submit
+      </button>
+    </div>
+    <div>
+        <form action="/logout" method="get">
+            <input type="submit" value="Logout">
+        </form>
+    </div>
+
+    <script>
+      var numberOfQuestion = 1;
+      function append() {
+        let html = ` <div id=${
+          "append" + numberOfQuestion
+        } class="card p-3 mt-3 mb-3">
+                    <div class="mb-3">
+                        <label for="question" class="form-label">Question</label>
+                        <input type="text" id="question" class="form-control" placeholder="Write Your Question">
+                    </div>
+                    <div class="row mb-3 p-2">
+                        <div class="col form-check">
+                            <input class="form-check-input" type="radio"  value="option1">
+                            <input type="text" id="option1" class="form-control" placeholder="option1">
+                        </div>
+                        <div class="col form-check">
+                            <input class="form-check-input" type="radio"  value="option2">
+                            <input type="text" id="option2" class="form-control" placeholder="option2">
+                        </div>
+                        <div class="col form-check">
+                            <input class="form-check-input" type="radio"  value="option3">
+                            <input type="text" id="option3" class="form-control" placeholder="option3">
+                        </div>
+                        <div class="col form-check">
+                            <input class="form-check-input" type="radio" value="option4">
+                            <input type="text" id="option4" class="form-control" placeholder="option4">
+                        </div>
+                    </div>
+                </div>
+            `;
+        let element = "append" + numberOfQuestion;
+        
+        document
+          .getElementById("append")
+          .insertAdjacentHTML("beforebegin", html);
+        numberOfQuestion++;
+      }
+
+      function sendData() {
+          let questions = [];
+          for (let i = 0; i < numberOfQuestion; i++) {
+            let checkbox = document.getElementById(`append${i}`);
+
+            let ques = document.getElementById(`append${i}`).children[0]
+              .children[1].value;
+            let options = [
+              checkbox.children[1].children[0].children[1].value,
+              checkbox.children[1].children[1].children[1].value,
+              checkbox.children[1].children[2].children[1].value,
+              checkbox.children[1].children[3].children[1].value,
+            ];
+
+            let answer = "";
+            for (let i = 0; i < 3; i++) {
+              if (checkbox.children[1].children[i].children[0].checked) {
+                answer = checkbox.children[1].children[i].children[1].value;
+              }
+            }
+            questions.push({
+              id: i + 1,
+              question: ques,
+              option: options,
+              correctAns: answer,
+            });
+          }
+
+          let questionDetail = {
+            createdBy: document.getElementById("createdBy").value,
+            topic: document.getElementById("topic").value,
+            numberOfQuestion: numberOfQuestion,
+            questions: questions,
+          };
+
+          fetch("http://localhost:3000/addQuestion", {
+            method: "POST",
+            body: JSON.stringify(questionDetail),
+            headers: {
+              "Content-type": "application/json; charset=UTF-8",
+            },
+          })
+            .then((res) => res.text())
+            .then((text) => alert(text))
+            .catch((err) => console.log(err));
+
+            resetForm()
+    }
+
+    function resetForm(){
+        document.getElementById('form').reset();
+        for(let i=1; i<numberOfQuestion; i++){
+            document.getElementById(`append${i}`).remove();
+        }
+        numberOfQuestion = 1
+    }
+    </script>
+  </body>
+</html>

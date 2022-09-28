@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+      crossorigin="anonymous"
+    />
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+      crossorigin="anonymous"
+    ></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container-fluid text-center mt-5">
+      <h2>Select Question Code</h2>
+    </div>
+    <div class="container-fluid">
+        <div class="row row-cols-2 text-center mt-5 justify-content-md-center" id="addContent">
+        </div>
+    </div>
+    <form action="/logout" method="get">
+      <input type="submit" value="Logout">
+  </form>
+
+    <script>
+        
+      (function () {
+        fetch("http://localhost:3000/fetchQuestionId")
+          .then((response) => response.json())
+          .then((response) => {
+            console.log(response);
+            let content = ""
+            for (let i = 0; i < response.length; i++) {
+              content += `
+                        <div class="col mt-4">
+                            <button class="btn btn-primary" onclick="redirectToQuiz('${response[i].questionId}')">${response[i].topic}</button>
+                        </div>
+                    `;
+            }
+            document.getElementById('addContent').innerHTML = content;
+          });
+      })();
+      function redirectToQuiz(questionId){
+        let url = 'http://localhost:3000/quiz/?' + questionId
+        window.location.href = url                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+      crossorigin="anonymous"
+    />
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+      crossorigin="anonymous"
+    ></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="container-fluid text-center mt-5"><h1 id="heading">Welcome to Quiz</h1></div>
+    <div id="replaceHtml">
+      <div class="container-fluid text-center text-danger" id="timer">
+        00:00
+      </div>
+      <div class="container-fluid text-center text-success mt-3">
+        <h1 id="questionNumber">1/5</h1>
+      </div>
+      <div class="container-fluid text-secondary mb-3 text-center">
+        <h3 id="question">What is the Capital of India</h3>
+      </div>
+      <div class="container-fluid mx-5">
+        <div class="row">
+          <div class="col">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="radiobtn"
+                id="option1"
+              />
+              <label class="form-check-label" id="option_1">
+                Default radio
+              </label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="radiobtn"
+                id="option2"
+              />
+              <label class="form-check-label" id="option_2">
+                Default radio
+              </label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="radiobtn"
+                id="option3"
+              />
+              <label class="form-check-label" id="option_3">
+                Default radio
+              </label>
+            </div>
+          </div>
+          <div class="col">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="radiobtn"
+                id="option4"
+              />
+              <label class="form-check-label" id="option_4">
+                Default radio
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid text-center mt-5">
+        <button
+          class="btn btn-success"
+          id="nextButton"
+          onclick="nextQuestion()"
+        >
+          Next Question
+        </button>
+        <button
+          class="btn btn-success"
+          id="submitButton"
+          onclick="submitAnswer()"
+          style="visibility: hidden"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var questions = [];
+      var ansArr = [];
+      var questId = window.location.search.substring(1);
+      (function () {
+        fetch("http://localhost:3000/fetchByQuestionId/" + questId)
+          .then((response) => response.json())
+          .then((response) => {
+            console.log(response);
+            document.getElementById(
+              "questionNumber"
+            ).innerHTML = `1/${response.length}`;
+            displayQuestionAndOption(response[0]);
+            if (response.length == 1) {
+              document.getElementById("nextButton").style.visibility = "hidden";
+              document.getElementById("submitButton").style.visibility =
+                "visible";
+            }
+            questions = response;
+          });
+      })();
+
+      function displayQuestionAndOption(response) {
+        document.getElementById("question").innerHTML = response.question;
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById("option_" + i).innerHTML =
+            response.option[i - 1];
+        }
+      }
+
+      var nextButtonCount = 1;
+      function nextQuestion() {
+        storeAns();
+        document.getElementById("questionNumber").innerHTML = `${
+          nextButtonCount + 1
+        }/${questions.length}`;
+        if (nextButtonCount < questions.length) {
+          displayQuestionAndOption(questions[nextButtonCount]);
+          nextButtonCount++;
+        }
+        if (nextButtonCount > questions.length - 1) {
+          document.getElementById("nextButton").style.visibility = "hidden";
+          document.getElementById("submitButton").style.visibility = "visible";
+        }
+      }
+      function storeAns() {
+        let checkboxes = document.getElementsByName("radiobtn");
+
+        for (let i = 0; i < checkboxes.length; i++) {
+          if (checkboxes[i].checked) {
+            ansArr.push(document.getElementById("option_" + (i + 1)).innerHTML);
+            checkboxes[i].checked = false;
+          }
+        }
+      }
+      //after submit function
+      var correctAnswer = 0;
+      function submitAnswer() {
+        console.log("This is the Submit Answer");
+        storeAns();
+        fetch("http://localhost:3000/fetchAnswer/" + questId)
+          .then((response) => response.json())
+          .then((response) => {
+            
+            for (let i = 0; i < ansArr.length && i < response.length; i++) {
+              if (ansArr[i] == response[i]) {
+                correctAnswer++;
+              }
+            }
+            
+            document.getElementById("replaceHtml").innerHTML = `
+                <div class="text-center text-secondary mt-4"><h1>${correctAnswer} is Correct out of ${response.length}</h1</div>
+            `;
+            document.getElementById('heading').innerHTML = "Thanks For Participating"
+          });
+          clearInterval(countDown);
+      }
+
+      //this is for timer
+      const timerVal = document.getElementById("timer");
+      let timeSecond = 30;
+      displayTime(timeSecond);
+      const countDown = setInterval(() => {
+        timeSecond--;
+        displayTime(timeSecond);
+        if (timeSecond <= 0 || timeSecond < 1) {
+          clearInterval(countDown);
+          alert("Time Up");
+          submitAnswer();
+        }
+      }, 1000);
+
+      function displayTime(second) {
+        const min = Math.floor(second / 60);
+        const sec = Math.floor(second % 60);
+        timerVal.innerHTML = `${min < 10 ? "0" : ""}${min}:${
+          sec < 10 ? "0" : ""
+        }${sec}`;
+      }
+    </script>
+  </body>
+</html>
